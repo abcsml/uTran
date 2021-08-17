@@ -10,13 +10,13 @@ router.get('/cre/:room', async (ctx, next) => {
 	if (!(room in sources)) {
 		sources[room]={'alive':1}
 		console.debug(`[debug] online: ${Object.keys(sources)}`)
-		ctx.body = {code:0, mess:'create room'}
+		ctx.body = {code:1, mess:'create room'}
 	} else {
 		ctx.body = {code:-1, mess:'room has been here'}
 	}
 })
 
-router.get('/off/:room', async (ctx, next) => {
+router.get('/ans/:room', async (ctx, next) => {
 	var room = ctx.params.room
 	if (!(room in sources)) {
 		ctx.body = {code:-1, mess:'room not exit'}
@@ -37,7 +37,7 @@ router.get('/off/:room', async (ctx, next) => {
 	}
 })
 
-router.get('/ans/:room', async (ctx, next) => {
+router.get('/off/:room', async (ctx, next) => {
 	var room = ctx.params.room
 	if (!(room in sources)) {
 		ctx.body = {code:-1, mess:'room not exit'}

@@ -4,6 +4,92 @@
  */
 
 
+// export 
+class RTCAnswer {
+    offTimeout = 4
+    iceGathTimeout = 40
+    baseUrl = '/api'
+
+    onopen = e => {console.log(`onopen: ${e}`)}
+    onicecandidate = e => {console.log(`onicecandidate: ${e}`)}
+    onmessage = e => {console.log(`onmessage: ${e}`)}
+
+    constructor(room) {
+        this.rtcPC = new RTCPeerConnection()
+        this.baseDc = this.rtcPC.createDataChannel("base", {negotiated: true, id: 0})
+        this.room = room
+        
+        this.init()
+        this.baseDcDebug()
+    }
+    async init() {
+        this.rtcPC.setConfiguration({
+            iceServers:[{urls:"stun:stun.gmx.net"}]
+        })
+        await this.waitOff()
+        await this.postAnsIce()
+        this.connectTimeout()
+    }
+    async waitOff() {
+        // long connect wait for Offer
+        var asking = false
+        var ans = setInterval(async ()=>{
+        if (asking == true) {return}
+        asking = true
+        axios.get(this.baseUrl+"/off/"+this.room)
+        .catch(e=>this.errHandle(e, 'waitOff'))
+        .then(e=>{
+            if (e.data.code == 1){
+                this.rtcPC.setRemoteDescription(e.data.mess)
+                this.rtcPC.createAnswer({"iceRestart": true})
+                .then(e=>this.rtcPC.setLocalDescription(e))
+                clearInterval(ans)
+            }
+        })
+        asking = false
+    },100)
+    }
+    async postAnsIce() {
+        // post ice
+        var e = await waitting(() => {
+            return (this.rtcPC.iceGatheringState == "complete")
+        }, this.iceGathTimeout)
+        if (e) {
+            axios.post(this.baseUrl+"/ans/"+this.room, this.rtcPC.localDescription)
+            .catch(e=>this.errHandle(e, 'postAnsIce'))
+            .then(e=>{
+                if (e.data.code != 1) {
+                    this.errHandle('Post Ice Error', '')
+                }
+            })
+        } else {
+            this.errHandle('postIceError', '')
+        }
+    }
+    connectTimeout() {
+        setTimeout(()=>{
+            if (this.rtcPC.iceConnectionState!="connected"){
+                alert("连接失败")
+            }
+        }, this.offTimeout*1000)
+    }
+    baseDcDebug() {
+        this.baseDc.onopen = this.onopen
+        this.baseDc.onicecandidate = this.onicecandidate
+        this.baseDc.onmessage = this.onmessage
+    }
+    errHandle(err, msg) {
+        console.log(err)
+        console.error(msg)
+        throw 'rtc Error'
+    }
+    createDc()
+}
+
+
+
+/*
+
 var pathName = document.location.pathname
 const room = pathName.substr(1)
 
@@ -119,3 +205,6 @@ function roll(){
         scrollTop: $('html, body').get(0).scrollHeight
     }, 100);
 }
+
+
+*/

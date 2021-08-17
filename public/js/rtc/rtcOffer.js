@@ -4,33 +4,47 @@
  * and listen for ans ice
  */
 
-import { ajax } from "ajax"
+// import { ajax } from "ajax"
 
-class RTCOffer extends RTCPeerConnection {
+/**
+ * 一个RTC对应多个DataChannel
+ */
+// export default
+class RTCOffer {
     offTimeout = 4
     iceGathTimeout = 40
     baseUrl = '/api'
 
-    constructor(room, name) {
-        super()
-        this.dc = this.createDataChannel(name)
+    onopen = e => {console.log(`onopen: ${e}`)}
+    onicecandidate = e => {console.log(`onicecandidate: ${e}`)}
+    onmessage = e => {console.log(`onmessage: ${e}`)}
+
+    constructor(room) {
+        this.rtcPC = new RTCPeerConnection()
         this.room = room
-        this.setConfiguration({
+        
+        this.init()
+        this.baseDcDebug()
+    }
+    async init() {
+        this.baseDc = this.rtcPC.createDataChannel("base", {negotiated: true, id: 0})
+        this.rtcPC.setConfiguration({
             iceServers:[{urls:"stun:stun.gmx.net"}]
         })
-        var e = await this.createOffer({"iceRestart": true})
-        await this.setLocalDescription(e)
-    }
-    async sendOff() {
-        dcDebug()
-        await offInit()
-        postOff()
-        waitAns()
+        this.rtcPC.createOffer({"iceRestart": true})
+        .then(e=>this.rtcPC.setLocalDescription(e))
+
+        // this.baseDc.onopen = this.onopen
+        // this.baseDc.onicecandidate = this.onicecandidate
+        // this.baseDc.onmessage = this.onmessage
+        await this.creOff()
+        await this.postOffIce()
+        this.waitAns()
     }
     async creOff() {
         // create room
         axios.get(this.baseUrl+"/cre/"+this.room)
-        .catch(e=>this.errHandle(e, ''))
+        .catch(e=>this.errHandle(e, 'Network Error'))
         .then(e=>{
             if (e.data.code != 1) {
                 this.errHandle('Create Room Error', '')
@@ -40,62 +54,67 @@ class RTCOffer extends RTCPeerConnection {
     async postOffIce() {
         // post ice
         var e = await waitting(() => {
-            return (lc.iceGatheringState == "complete")
-        }, iceGathTimeout)
+            return (this.rtcPC.iceGatheringState == "complete")
+        }, this.iceGathTimeout)
         if (e) {
-            axios.post(this.baseUrl+"/off/"+this.room, lc.localDescription)
-            .catch(e=>this.errHandle(e, ''))
+            axios.post(this.baseUrl+"/off/"+this.room, this.rtcPC.localDescription)
+            .catch(e=>this.errHandle(e, 'net'))
             .then(e=>{
                 if (e.data.code != 1) {
                     this.errHandle('Post Ice Error', '')
                 }
             })
         } else {
-            this.errHandle()
+            this.errHandle('Post Ice Error', this.rtcPC.iceGatheringState)
         }
     }
     waitAns() {
         // long connect wait for ans
         var asking = false
-        var ans = setInterval(async function(){
+        var ans = setInterval(async ()=>{
             if (asking == true) {return}
             asking = true
-            var e = await axios.get('http://abcs.ml:9999/off/'+room)
-            if (e.data.code){
-                await lc.setRemoteDescription(e.data.mess)
-                console.log(e.data.mess)
-                clearInterval(ans)
-
-                setTimeout(()=>{
-                    if (lc.iceConnectionState!="connected"){
-                        alert("连接失败")
-                    }
-                }, this.offTimeout*1000)
-
-            }
+            await axios.get(this.baseUrl+"/ans/"+this.room)
+            .catch(e=>this.errHandle(e, 'wait'))
+            .then(e=>{
+                if (e.data.code == 1){
+                    this.rtcPC.setRemoteDescription(e.data.mess)
+                    clearInterval(ans)
+                    this.connectTimeout()
+                }
+            })
             asking = false
         },100)
     }
-    dcDebug() {
-        this.dc.onmessage = e => {
-            console.log(`onmessage: ${e}`)
-        }
-        this.dc.onopen = e => {
-            console.log(`onopen: ${e}`)
-        }
-        this.dc.onicecandidate = e => {
-            console.log(`onicecandidate: ${e}`)
-        }
+    connectTimeout() {
+        setTimeout(()=>{
+            if (this.rtcPC.iceConnectionState!="connected"){
+                alert("连接失败")
+            }
+        }, this.offTimeout*1000)
+    }
+    baseDcDebug() {
+        this.baseDc.onopen = this.onopen
+        this.baseDc.onicecandidate = this.onicecandidate
+        this.baseDc.onmessage = this.onmessage
     }
     errHandle(err, msg) {
-        console.log(err.message)
-        console.error(msg)
+        console.log(err)
+        console.log(msg)
+        throw 'rtc Error'
     }
-    ajax()
 }
 
 
+/* 继承行不通
 
+
+
+export {RTCOffer}
+
+*/
+
+/*
 
 // const getinterval = 1
 const conntimeout = 4
@@ -177,6 +196,8 @@ async function init(){
         axios.post("http://abcs.ml:9999/off/"+room,lc.localDescription)
     } else {alert("error")}
 }
+
+*/
 
 async function waitting(f, outtime) {
     return new Promise(function(resolve, reject) {
