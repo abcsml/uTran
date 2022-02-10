@@ -4,6 +4,16 @@ const tools = require('../tools')
 var sources = require('../vals').sources
 const SET = require('../vals').SET
 
+// 查询房间是否存在
+router.get('/get/:room', async (ctx, next) => {
+	var room = ctx.params.room
+	if (room in sources) {
+		ctx.body = {code:1, mess:'room exist'}
+	} else {
+		ctx.body = {code:0, mess:'room not exist'}
+	}
+})
+
 // 创建房间
 router.get('/cre/:room', async (ctx, next) => {
 	var room = ctx.params.room
@@ -27,7 +37,7 @@ router.get('/ans/:room', async (ctx, next) => {
 	}, SET.longConTime)
 	if (result) {
 		ctx.body = {code:1, mess:sources[room]['ans']}
-		delete sources[room]		// 清除房间
+		sources[room]['alive'] = 0		// 清除房间
 		console.debug(`[debug] del ${room}`)
 	} else {
 		// renew
@@ -46,7 +56,7 @@ router.get('/off/:room', async (ctx, next) => {
 	var result = await tools.waitting(()=>{
 		return (room in sources && 'off' in sources[room])
 	}, SET.longConTime)
-	if (result == 1) {
+	if (result) {
 		ctx.body = {code:1, mess:sources[room]['off']}
 	} else {
 		await tools.delaySec(SET.baseDelayTime)
@@ -67,7 +77,7 @@ router.post('/:meth/:room', async (ctx, next) => {
 		return
 	}
 	if (meth in sources[room]) {
-		ctx.body = {code:0, mess:'room in use'}
+		ctx.body = {code:-1, mess:'room in use'}
 	} else {
 		sources[room][meth] = ctx.request.body;
 		console.log(`[debug] ${room} ${meth} ans is:${sources[room][meth]}`)
