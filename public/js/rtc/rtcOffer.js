@@ -6,7 +6,7 @@
 
 import ajax from "./ajax.js"
 
-const offTimeout = 4
+const offTimeout = 10
 const iceGathTimeout = 40
 const baseUrl = '/api/'
 
@@ -23,7 +23,7 @@ async function getRTCOffer(room) {
     .then(e=>rtcPC.setLocalDescription(e))
     await creOff(room)
     await postOffIce(room, rtcPC)
-    waitAns(room, rtcPC)
+    await waitAns(room, rtcPC)
     return rtcPC
 }
 
@@ -47,6 +47,7 @@ async function postOffIce(room, rtcPC) {
 
 function waitAns(room, rtcPC) {
     // long connect wait for ans
+    var flag = false
     var asking = false
     var ans = setInterval(async ()=>{
         if (asking == true) {return}
@@ -55,13 +56,18 @@ function waitAns(room, rtcPC) {
         .catch(e=>console.log(e))
         .then(e=>{
             if (e.code == 1){
+                console.log(e)
                 rtcPC.setRemoteDescription(e.mess)
                 clearInterval(ans)
                 connectTimeout(rtcPC)
+                flag = true
             }
         })
         asking = false
     },100)
+    return waitting(() => {
+        return (flag)
+    })
 }
 
 function connectTimeout(rtcPC) {

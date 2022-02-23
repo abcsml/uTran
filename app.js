@@ -8,6 +8,7 @@ const bodyparser = require('koa-bodyparser')
 
 var vals = require('./vals')
 var sourcesGC = require('./tools').sourcesGC
+var getIpAddress = require('./tools').getIpAddress
 
 // error handler
 onerror(app, {redirect: '/error.html'})
@@ -41,5 +42,5 @@ sourcesGC(vals.sources, vals.SET.gcInterTime)
 
 // listen
 app.listen(4000,()=>{
-	console.log('server started at port 4000....')
+	console.log(`server started at http://${getIpAddress()}:4000 ....`)
 })

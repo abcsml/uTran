@@ -5,7 +5,7 @@
 
 import ajax from "./ajax.js"
 
-const offTimeout = 4
+const offTimeout = 10
 const iceGathTimeout = 40
 const baseUrl = '/api/'
 
@@ -18,28 +18,32 @@ async function getRTCAnswer(room) {
     .then(e=>rtcPC.setLocalDescription(e))
     await waitOff(room, rtcPC)
     await postAnsIce(room, rtcPC)
-    connectTimeout(rtcPC)
     return rtcPC
 }
 
 async function waitOff(room, rtcPC) {
     // long connect wait for Offer
+    var flag = false
     var asking = false
     var ans = setInterval(async ()=>{
-    if (asking == true) {return}
-    asking = true
-    ajax.get(baseUrl+"off/"+room)
-    .catch(e=>console.log(e))
-    .then(e=>{
-        if (e.code == 1){
-            rtcPC.setRemoteDescription(e.mess)
-            rtcPC.createAnswer({"iceRestart": true})
-            .then(e=>rtcPC.setLocalDescription(e))
-            clearInterval(ans)
-        }
-    })
-    asking = false
+        if (asking == true) {return}
+        asking = true
+        await ajax.get(baseUrl+"off/"+room)
+        .catch(e=>console.log(e))
+        .then(e=>{
+            if (e.code == 1){
+                rtcPC.setRemoteDescription(e.mess)
+                rtcPC.createAnswer({"iceRestart": true})
+                .then(e=>rtcPC.setLocalDescription(e))
+                clearInterval(ans)
+                flag = true
+            }
+        })
+        asking = false
     },100)
+    return waitting(() => {
+        return (flag)
+    })
 }
 
 async function postAnsIce(room, rtcPC) {
@@ -53,6 +57,7 @@ async function postAnsIce(room, rtcPC) {
     } else {
         console.log('Post Ice Error')
     }
+    connectTimeout(rtcPC)
 }
 
 function connectTimeout(rtcPC) {
