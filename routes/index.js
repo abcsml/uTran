@@ -14,10 +14,10 @@ router.get(['/:room'], async (ctx, next) => {
 	ctx.set("Content-Type", "text/html;charset=utf-8")
 	var room = ctx.params.room
 	if (room in sources) {		// answer
-		var htmlContent = fs.readFileSync("views/chat.html")
+		var htmlContent = fs.readFileSync("public/chat.html")
 		ctx.body = htmlContent;
 	} else {								// offer
-		var htmlContent = fs.readFileSync("views/chat.html")
+		var htmlContent = fs.readFileSync("public/chat.html")
 		ctx.body = htmlContent
 	}
 })
