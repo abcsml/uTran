@@ -10,16 +10,18 @@ function file2base64(file){
 }
 
 async function fileSender(sendMethod, file, blockSize=32*8*1024) {
-    var num = Math.ceil(file.size / blockSize)
-    for (var i=1;i<=num;i++) {
-        var nextSize = Math.min(segment*blockSize, file.size)
-        var fileData = file.slice((segment-1)*blockSize, nextSize)
+    var fileDataURL = await file2base64(file)
+    var num = Math.ceil(fileDataURL.length / blockSize)
+    for (var segment=1;segment<=num;segment++) {
+        var nextSize = Math.min(segment*blockSize, fileDataURL.length)
+        var fileData = fileDataURL.substring((segment-1)*blockSize, nextSize)
+        // var a = await file2base64(fileData)
         await sendMethod(JSON.stringify({
             "fileName": file.name,
-            "segment": i,
+            "segment": segment,
             "nums": num,
-            "fileData": await file2base64(fileData)
-        }))
+            "fileData": fileData
+        }),segment/num*100)
     }
 }
 
@@ -32,4 +34,4 @@ function silceFile(file, segment, blockSize) {
 }
 // 校验
 
-export {fileSender}
+export { fileSender, file2base64 }
