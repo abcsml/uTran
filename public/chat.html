@@ -9,17 +9,15 @@
     <link rel="stylesheet" href="css/chat.css">
 </head>
 <body>
+    <h2 id="info" style="text-align: center;">等待对方连接...</h2>
     <div class="talk_con">
         <div class="talk_show" id="words" ondragover="event.stopPropagation();event.preventDefault();">
         </div>
-        <div class="talk_input">
-            <select class="whotalk" id="who">
-                <option value="0">用户：</option>
-                <option value="1">对方：</option>
-            </select>
-            <input type="text" class="talk_word" id="talkwords">
-            <input type="button" value="发送" class="talk_sub" id="talksub">
-        </div>
+    </div>
+    <div id="bottom_anchor"></div>
+    <div class="talk_input">
+        <input type="text" class="talk_word" id="talkwords">
+        <input type="button" value="发送" class="talk_sub" id="talksub">
     </div>
 </body>
 </html>

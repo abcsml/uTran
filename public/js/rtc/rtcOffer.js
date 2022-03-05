@@ -23,7 +23,7 @@ async function getRTCOffer(room) {
     .then(e=>rtcPC.setLocalDescription(e))
     await creOff(room)
     await postOffIce(room, rtcPC)
-    await waitAns(room, rtcPC)
+    waitAns(room, rtcPC)
     return rtcPC
 }
 
@@ -59,7 +59,7 @@ function waitAns(room, rtcPC) {
                 console.log(e)
                 rtcPC.setRemoteDescription(e.mess)
                 clearInterval(ans)
-                connectTimeout(rtcPC)
+                // connectTimeout(rtcPC)
                 flag = true
             }
         })

@@ -57,7 +57,7 @@ async function postAnsIce(room, rtcPC) {
     } else {
         console.log('Post Ice Error')
     }
-    connectTimeout(rtcPC)
+    // connectTimeout(rtcPC)
 }
 
 function connectTimeout(rtcPC) {
