@@ -7,18 +7,32 @@
     <script type="module" src="js/usr.js"></script>
     <title>chat</title>
     <link rel="stylesheet" href="css/chat.css">
+    <script>
+        window.onload = function(){
+            let talk_con = document.getElementsByClassName("talk_con")[0]
+            let talk_show = document.getElementsByClassName("talk_show")[0]
+            talk_con.style.height = (window.innerHeight-120) + "px"
+            talk_show.style.height = (window.innerHeight-120-60) + "px"
+            window.onresize = function(){
+                talk_con.style.height = (window.innerHeight-120) + "px"
+                talk_show.style.height = (window.innerHeight-120-60) + "px"              
+            }
+        }
+    </script>
 </head>
 <body>
     <h2 id="info" style="text-align: center;">等待对方连接...</h2>
     <div class="talk_con">
         <div class="talk_show" id="words" ondragover="event.stopPropagation();event.preventDefault();">
         </div>
+        <div class="talk_input">
+            <input type="text" class="talk_word" id="talkwords">
+            <input id="seed_file" type="file" hidden>
+            <button class="seed_sub" id="seedsub" onclick="document.getElementById('seed_file').click()">+</button>
+            <input type="button" value="发送" class="talk_sub" id="talksub">
+        </div>
     </div>
     <div id="bottom_anchor"></div>
-    <div class="talk_input">
-        <input type="text" class="talk_word" id="talkwords">
-        <input type="button" value="发送" class="talk_sub" id="talksub">
-    </div>
 </body>
 </html>
 

@@ -1,52 +1,50 @@
 .talk_con{
     max-width:1100px;
-    width:95%;
-    height:678px;
-    border:1px solid #666;
-    margin:2px auto 0;
+    /* height:680px; */
+    min-height: 500px;
+    width: 100%;
+    border:3px solid #666;
+    margin:5px auto 30px;
     background:#f9f9f9;
 }
 .talk_show{
-    width:98%;
-    height: 90%;
-    border:1px solid #666;
-    background:#fff;
+    /* width:1080px;
+    height:600px; */
+    width: 100%;
+    height: 100%;
+    /* border:1px solid #666; */
+    /* background:#fff; */
     margin:10px auto 0;
     overflow:auto;
 }
 .talk_input{
-    width:90%;
-    height: 45px;
-    margin:10px auto 0;
+    /* max-width: 500px; */
+    width:94%;
+    margin:3% auto 0 3%;
+    position: fixed;
+    bottom: 0;
 }
 @media screen and (min-width: 520px){
     .talk_input{
-        width: 70%;
-        /* left: 50%;
-        margin-left: -250px; */
+        width: 500px;
+        left: 50%;
+        margin-left: -250px;
     }
 }
 .talk_word{
-    width:65%;
-    height:25px;
-    padding:1px;
+    width:80%;
+    height:26px;
+    padding:0px;
     float:left;
-    margin-left:9px;
+    /* margin-left:10px; */
     outline:none;
-    text-indent:9px;
+    text-indent:10px;
 }        
-.seed_sub{
-    margin-left: 10px;
-    width: 30px;
-    height: 30px;
-    border-radius:50%;
-    float: left;
-}
 .talk_sub{
     width:15%;
     height:30px;
     float:left;
-    margin-left:10px;
+    margin-left:2%;
 }
 .atalk{
    margin:10px; 
@@ -69,6 +67,7 @@
     color:rgb(0, 0, 0);
     padding:5px 10px;
 }
+
 progress{
     width: 100px;
 }
@@ -77,6 +76,7 @@ progress{
     padding-left: 10px;
     padding-top: 2px;
 }
-.filed:hover{
-    background-color: #666;
-}
+/* .file_box_svg{
+    width:30;
+    height:40;
+} */

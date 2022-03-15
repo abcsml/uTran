@@ -19,7 +19,8 @@ function imgBox(imgName, url, who="atalk") {
 }
 function fileBox(fileName, urlId, progressId, who="atalk") {
     return `
-    <div class="${who}"><span>
+    <div class="${who}">
+    <span class="filed" title="点击下载文件" onclick="document.getElementById('${urlId}').click()">
         <img alt="file" width=30 height=40 src="assets/file-earmark-arrow-down.svg"/>
         <div class="file_box">
             <a float=right>${fileName.substring(0,8)}</a>
@@ -50,8 +51,8 @@ export default {
         Words.innerHTML += fileBox(file.name,"url"+fileId,"pro"+fileId,"btalk")
         var pro = document.getElementById("pro"+fileId)
         var herf = document.getElementById("url"+fileId)
-        pro.value = 100
-        herf.setAttribute("herf",url)
+        // pro.value = 100
+        herf.setAttribute("href",url)
     },
     addFile(fileName, fileId) {
         Words.innerHTML += fileBox(fileName,"url"+fileId,"pro"+fileId)

@@ -60,8 +60,8 @@ rtc.baseDC.onmessage = async (e) => {
             chat.addFile(m.data.fileName,fileId)
             var pro = document.getElementById("pro"+fileId)
             var url = await getFile(rtc,m.data,pro)
-            var herf = document.getElementById("url"+fileId)
-            herf.setAttribute("herf",url)
+            var href = document.getElementById("url"+fileId)
+            href.setAttribute("href",url)
         }
     }
     chat.scrollToBottom()
@@ -91,19 +91,29 @@ TalkWords.onkeydown = (e) => {
 }
 
 var Words = document.getElementById("words")
-Words.ondrop = async (e) => {
-    e.preventDefault()
-    var files = e.dataTransfer.files
+async function handleFile(files) {
     for (var i=0;i<files.length;i++) {
         console.log(files[i].type)
         if (files[i].type.includes('image')) {
-            chat.showImg(files[i])
+            await chat.showImg(files[i])
+            await sendFile(rtc,fileDCId,files[i],{})
         } else {
-            chat.showFile(files[i],fileNum)
+            await chat.showFile(files[i],fileNum)
+            var pro = document.getElementById("pro"+fileNum)
+            await sendFile(rtc,fileDCId,files[i],pro)
             fileNum += 1
         }
-        await sendFile(rtc,fileDCId,files[i])
         fileDCId += 1
         chat.scrollToBottom()
     }
+}
+Words.ondrop = async (e) => {
+    e.preventDefault()
+    var files = e.dataTransfer.files
+    handleFile(files)
+}
+var seed_file = document.getElementById("seed_file")
+seed_file.onchange = async (e) => {
+    var files = seed_file.files
+    handleFile(files)
 }

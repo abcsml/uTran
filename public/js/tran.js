@@ -35,18 +35,23 @@ function sendFileAbs(baseDC, fileDCId, file) {
 }
 
 // 分段发送文件二进制，必须保证顺序
-async function sendFileByBuf(fileDC, file) {
+async function sendFileByBuf(fileDC, file, progress) {
     var buf = await file2Buf(file)
     var segNums = Math.ceil(file.size / segSize)
     for (var i=1;i<=segNums;i++) {
+        progress.value = 100*(i / segNums)
+        await waitting(()=>{
+            return fileDC.bufferedAmount < 1000000
+        },60*5)
         var nextSize = Math.min(i*segSize, buf.byteLength)
         var bufData = buf.slice((i-1)*segSize, nextSize)
         fileDC.send(bufData)
+        console.log(fileDC.bufferedAmount)
     }
 }
 
 // 通过fileDC发送，对方返回OK再close
-async function sendFile(rtc, fileDCId, file) {
+async function sendFile(rtc, fileDCId, file, progress) {
     var segNums = Math.ceil(file.size / segSize)
     var fileDC = rtc.createDataChannel("file",{
         negotiated: true,
@@ -54,7 +59,7 @@ async function sendFile(rtc, fileDCId, file) {
     })
     sendFileAbs(rtc.baseDC,fileDCId,file)
     fileDC.onopen = (e) => {
-        sendFileByBuf(fileDC, file)
+        sendFileByBuf(fileDC, file, progress)
     }
     return new Promise(function(resolve, reject) {
         fileDC.onmessage = (e) => {
@@ -96,3 +101,23 @@ async function getFile(rtc, fileAbs, progress) {
 }
 
 export { sendMess, getMess, sendFile, getFile }
+
+async function waitting(f, outtime) {
+    return new Promise(function(resolve, reject) {
+        if (f()) {
+            resolve(true)
+            return
+        }
+        var t = new Date()
+        var it = setInterval(function() {
+            if (f()) {
+                clearInterval(it)
+                resolve(true)
+            }
+            if ((Date.now() - t)/1000 > outtime) {
+                clearInterval(it)
+                resolve(false)
+            }
+        }, 100)
+    })
+}
