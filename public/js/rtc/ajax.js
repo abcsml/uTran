@@ -1,5 +1,6 @@
 // 跨网站提供api
-const server = "https://abcs.ml:9999"
+const server = ""
+// const server = "https://abcs.ml:9999"
 
 // 拦截器
 async function interceptors(response) {

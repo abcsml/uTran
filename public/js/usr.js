@@ -10,7 +10,11 @@ import { sendMess, getMess, sendFile, getFile } from "./tran.js"
 import debug from "./debug.js"
 
 var pathName = document.location.pathname
-const room = pathName.substring(1)
+var room = pathName.substring(1)
+
+if (room == "") {
+    room = "chat"
+}
 
 var a = await ajax.get('/api/get/'+room)
 if (a.code == 0) {

@@ -38,6 +38,9 @@ router.get('/ans/:room', async (ctx, next) => {
 	if (result) {
 		ctx.body = {code:1, mess:sources[room]['ans']}
 		sources[room]['alive'] = 0		// 准备清除房间
+		setTimeout(()=>{
+			delete sources[room]
+		},100)
 		// console.debug(`[debug] del ${room}`)
 	} else {
 		// renew
