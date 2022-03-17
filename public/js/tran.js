@@ -35,23 +35,23 @@ function sendFileAbs(baseDC, fileDCId, file) {
 }
 
 // 分段发送文件二进制，必须保证顺序
-async function sendFileByBuf(fileDC, file, progress) {
+async function sendFileByBuf(fileDC, file, profun) {
     var buf = await file2Buf(file)
     var segNums = Math.ceil(file.size / segSize)
     for (var i=1;i<=segNums;i++) {
-        progress.value = 100*(i / segNums)
+        profun(100*(i / segNums))
         await waitting(()=>{
             return fileDC.bufferedAmount < 1000000
         },60*5)
         var nextSize = Math.min(i*segSize, buf.byteLength)
         var bufData = buf.slice((i-1)*segSize, nextSize)
         fileDC.send(bufData)
-        console.log(fileDC.bufferedAmount)
+        // console.log(fileDC.bufferedAmount)
     }
 }
 
 // 通过fileDC发送，对方返回OK再close
-async function sendFile(rtc, fileDCId, file, progress) {
+async function sendFile(rtc, fileDCId, file, profun) {
     var segNums = Math.ceil(file.size / segSize)
     var fileDC = rtc.createDataChannel("file",{
         negotiated: true,
@@ -59,12 +59,13 @@ async function sendFile(rtc, fileDCId, file, progress) {
     })
     sendFileAbs(rtc.baseDC,fileDCId,file)
     fileDC.onopen = (e) => {
-        sendFileByBuf(fileDC, file, progress)
+        sendFileByBuf(fileDC, file, profun)
     }
     return new Promise(function(resolve, reject) {
         fileDC.onmessage = (e) => {
             if (e.data == "OK") {
                 fileDC.close()
+                console.log("send success")
                 resolve(true)
             }
         }
@@ -76,7 +77,7 @@ async function sendFile(rtc, fileDCId, file, progress) {
 }
 
 // 从特定DC获取file，返回blob链接，progress
-async function getFile(rtc, fileAbs, progress) {
+async function getFile(rtc, fileAbs, profun) {
     var fileDC = rtc.createDataChannel("file",{
         negotiated: true,
         id: fileAbs.fileDCId
@@ -87,7 +88,7 @@ async function getFile(rtc, fileAbs, progress) {
         fileDC.onmessage = (e) => {
             bufs.push(e.data)
             count += 1
-            progress.value = 100*(count / fileAbs.segNums)
+            profun(100*(count / fileAbs.segNums))
             if (count == fileAbs.segNums) {
                 fileDC.send("OK")
                 var buf = combineBuf(bufs,fileAbs.fileSize)

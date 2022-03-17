@@ -6,20 +6,26 @@
 import { file2Buf, getNewUrl } from "./file.js"
 
 var Words = document.getElementById("words")
+var Anchor = document.getElementById("bottom_anchor")
 
 function messBox(mess, name, who="atalk") {
-    return `
-    <div class="${who}"><span>${name}${mess}</span></div>`
+    var div = document.createElement("div")
+    div.setAttribute("class",who)
+    div.innerHTML += `<span>${name}${mess}</span>`
+    return div
 }
 function imgBox(imgName, url, who="atalk") {
-    return `
-    <div class="${who}"><span>
+    var div = document.createElement("div")
+    div.setAttribute("class",who)
+    div.innerHTML += `<span>
         <img src="${url}" style="max-width:300px; max-height:300px;"/>
-    </span></div>`
+    </span>`
+    return div
 }
 function fileBox(fileName, urlId, progressId, who="atalk") {
-    return `
-    <div class="${who}">
+    var div = document.createElement("div")
+    div.setAttribute("class",who)
+    div.innerHTML += `
     <span class="filed" title="点击下载文件" onclick="document.getElementById('${urlId}').click()">
         <img alt="file" width=30 height=40 src="assets/file-earmark-arrow-down.svg"/>
         <div class="file_box">
@@ -29,42 +35,42 @@ function fileBox(fileName, urlId, progressId, who="atalk") {
             </div>
         </div>
         <a id="${urlId}" download="${fileName}"></a>
-    </span></div>`
+    </span>`
+    return div
 }
 
 export default {
     showMess(mess, name) {
-        Words.innerHTML += messBox(mess,name,"btalk")
+        Words.insertBefore(messBox(mess,name,"btalk"),Anchor)
     },
     addMess(mess, name) {
-        Words.innerHTML += messBox(mess,name)
+        Words.insertBefore(messBox(mess,name),Anchor)
     },
     async showImg(img) {
         var url = getNewUrl(await file2Buf(img),img.type)
-        Words.innerHTML += imgBox(img.name,url,"btalk")
+        Words.insertBefore(imgBox(img.name,url,"btalk"),Anchor)
     },
     addImg(imgName, url) {
-        Words.innerHTML += imgBox(imgName,url)
+        Words.insertBefore(imgBox(imgName,url),Anchor)
     },
     async showFile(file, fileId) {
         var url = getNewUrl(await file2Buf(file),file.type)
-        Words.innerHTML += fileBox(file.name,"url"+fileId,"pro"+fileId,"btalk")
+        Words.insertBefore(fileBox(file.name,"url"+fileId,"pro"+fileId,"btalk"),Anchor)
         var pro = document.getElementById("pro"+fileId)
         var herf = document.getElementById("url"+fileId)
         // pro.value = 100
         herf.setAttribute("href",url)
     },
     addFile(fileName, fileId) {
-        Words.innerHTML += fileBox(fileName,"url"+fileId,"pro"+fileId)
+        Words.insertBefore(fileBox(fileName,"url"+fileId,"pro"+fileId),Anchor)
     },
     sendInfo(message) {
         var h2 = document.getElementById("info")
         h2.textContent = message
     },
     scrollToBottom() {
-        var a = document.getElementById("bottom_anchor")
-        // var distance = 20+a.offsetTop-document.documentElement.scrollTop
-        var distance = a.offsetTop
-        window.scrollTo({top:distance,behavior:'smooth'})
+        setTimeout(()=>{
+            Anchor.scrollIntoView({behavior:"smooth"})
+        },5)
     }
 }

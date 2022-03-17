@@ -21,18 +21,21 @@
     </script>
 </head>
 <body>
-    <h2 id="info" style="text-align: center;">等待对方连接...</h2>
+    <div style="text-align: center; margin: 20px auto 20px;max-width: 1100px;width: 95%;">
+    <span id="info" style="font-size: x-large;font-weight: 800;">等待对方连接</span>
+    <img id="setting" width=26 style="float: right;margin-right: 20px;" src="assets/sliders.svg"/>
+    </div>
     <div class="talk_con">
         <div class="talk_show" id="words" ondragover="event.stopPropagation();event.preventDefault();">
+        <div id="bottom_anchor"></div>
         </div>
         <div class="talk_input">
             <input type="text" class="talk_word" id="talkwords">
             <input id="seed_file" type="file" hidden>
-            <button class="seed_sub" id="seedsub" onclick="document.getElementById('seed_file').click()">+</button>
+            <img src="assets/folder2.svg" class="seed_sub" id="seedsub" onclick="document.getElementById('seed_file').click()"/>
             <input type="button" value="发送" class="talk_sub" id="talksub">
         </div>
     </div>
-    <div id="bottom_anchor"></div>
 </body>
 </html>
 

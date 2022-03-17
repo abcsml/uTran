@@ -1,4 +1,5 @@
-// export {ajax}
+// 跨网站提供api
+const server = "https://abcs.ml:9999"
 
 // 拦截器
 async function interceptors(response) {
@@ -12,7 +13,7 @@ async function interceptors(response) {
 // get和post封装
 export default {
   async get(url) {
-    var response = await fetch(url, {
+    var response = await fetch(server+url, {
       method: 'get',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8'
@@ -21,7 +22,7 @@ export default {
     return interceptors(response)
   },
   async post(url, data) {
-    var response = await fetch(url, {
+    var response = await fetch(server+url, {
       method: 'post',
       headers: {
         'Content-Type': 'application/json;charset=UTF-8'

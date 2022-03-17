@@ -7,6 +7,7 @@ import { getRTCOffer } from "./rtc/rtcOffer.js"
 import { getRTCAnswer } from "./rtc/rtcAnswer.js"
 import chat from "./chat.js"
 import { sendMess, getMess, sendFile, getFile } from "./tran.js"
+import debug from "./debug.js"
 
 var pathName = document.location.pathname
 const room = pathName.substring(1)
@@ -18,12 +19,35 @@ if (a.code == 0) {
     var rtc = await getRTCAnswer(room)
 }
 
-// setTimeout(()=>{
-//     if (rtc.iceConnectionState!="connected"){
-//         alert("连接失败")
-//         sendInfo("连接失败")
+function conectTimeout(time) {
+    setTimeout(()=>{
+        if (rtc.iceConnectionState!="connected"){
+            rtc.close()
+            // alert("连接失败")
+            setTimeout(()=>{
+                chat.sendInfo("连接失败")
+            },100)
+        }
+    }, time*1000)
+}
+
+rtc.oniceconnectionstatechange = e => {
+    if (rtc.iceConnectionState == "checking") {
+        chat.sendInfo("正在连接")
+        conectTimeout(5)
+    } else if (rtc.iceConnectionState == "closed") {
+        chat.sendInfo("对方断开连接")
+    }
+}
+
+// rtc.onconnectionstatechange = e => {
+//     if (rtc.connectionState == "failed") {
+//         chat.sendInfo("连接失败")
+//         rtc.close()
+//     } else if (rtc.connectionState == "connecting") {
+//         chat.sendInfo("正在连接")
 //     }
-// }, 5*1000)
+// }
 
 var fileNum = 0
 var fileDCId = 1;
@@ -51,15 +75,17 @@ rtc.baseDC.onmessage = async (e) => {
     if (m.type == "mess") {
         chat.addMess(m.data,"")
     } else if (m.type == "file") {
+        fileDCId = Math.max(fileDCId, m.data.fileDCId)
         if (m.data.fileType.includes('image')) {
-            var url = await getFile(rtc,m.data,{})
+            var url = await getFile(rtc,m.data,()=>{})
             chat.addImg(m.data.fileName,url)
         } else {
             var fileId = fileNum
             fileNum += 1
             chat.addFile(m.data.fileName,fileId)
-            var pro = document.getElementById("pro"+fileId)
-            var url = await getFile(rtc,m.data,pro)
+            var url = await getFile(rtc,m.data,v=>{
+                document.getElementById("pro"+fileId).value=v
+            })
             var href = document.getElementById("url"+fileId)
             href.setAttribute("href",url)
         }
@@ -93,17 +119,19 @@ TalkWords.onkeydown = (e) => {
 var Words = document.getElementById("words")
 async function handleFile(files) {
     for (var i=0;i<files.length;i++) {
+        fileDCId += 1
         console.log(files[i].type)
         if (files[i].type.includes('image')) {
             await chat.showImg(files[i])
-            await sendFile(rtc,fileDCId,files[i],{})
+            sendFile(rtc,fileDCId,files[i],()=>{})
         } else {
-            await chat.showFile(files[i],fileNum)
-            var pro = document.getElementById("pro"+fileNum)
-            await sendFile(rtc,fileDCId,files[i],pro)
+            var fileId = fileNum
             fileNum += 1
+            await chat.showFile(files[i],fileId)
+            await sendFile(rtc,fileDCId,files[i],v=>{
+                document.getElementById("pro"+fileId).value=v
+            })
         }
-        fileDCId += 1
         chat.scrollToBottom()
     }
 }
@@ -116,4 +144,9 @@ var seed_file = document.getElementById("seed_file")
 seed_file.onchange = async (e) => {
     var files = seed_file.files
     handleFile(files)
+}
+
+var setting = document.getElementById("setting")
+setting.ondblclick = e => {
+    debug(rtc,10)
 }
