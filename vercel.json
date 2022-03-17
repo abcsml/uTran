@@ -3,6 +3,7 @@
     { "source": "/view-source", "destination": "https://github.com/vercel/vercel" }
   ],
   "rewrites": [
-    { "source": "/:path*", "destination": "/chat.html" }
+    { "source": "/:path*", "destination": "/chat.html" },
+    { "source": "/", "destination": "/chat.html" }
   ]
 }
