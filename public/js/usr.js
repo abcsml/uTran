@@ -25,7 +25,7 @@ if (a.code == 0) {
 
 function conectTimeout(time) {
     setTimeout(()=>{
-        if (rtc.iceConnectionState!="connected"){
+        if (rtc.iceConnectionState!="connected"&&rtc.iceConnectionState!="completed"){
             rtc.close()
             // alert("连接失败")
             setTimeout(()=>{
@@ -35,7 +35,7 @@ function conectTimeout(time) {
     }, time*1000)
 }
 
-rtc.oniceconnectionstatechange = e => {
+function testConnect() {
     if (rtc.iceConnectionState == "checking") {
         chat.sendInfo("正在连接")
         conectTimeout(5)
@@ -44,6 +44,11 @@ rtc.oniceconnectionstatechange = e => {
     } else if (rtc.iceConnectionState == "disconnected") {
         chat.sendInfo("对方断开连接")
     }
+}
+// 先测试一下
+testConnect()
+rtc.oniceconnectionstatechange = e => {
+    testConnect()
 }
 
 // rtc.onconnectionstatechange = e => {
