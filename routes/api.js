@@ -40,7 +40,8 @@ router.get('/ans/:room', async (ctx, next) => {
 		sources[room]['alive'] = 0		// 准备清除房间
 		setTimeout(()=>{
 			delete sources[room]
-		},100)
+			console.debug(`[debug] del ${room}`)
+		},1000)
 		// console.debug(`[debug] del ${room}`)
 	} else {
 		// renew

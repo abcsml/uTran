@@ -41,6 +41,8 @@ rtc.oniceconnectionstatechange = e => {
         conectTimeout(5)
     } else if (rtc.iceConnectionState == "closed") {
         chat.sendInfo("对方断开连接")
+    } else if (rtc.iceConnectionState == "disconnected") {
+        chat.sendInfo("对方断开连接")
     }
 }
 
