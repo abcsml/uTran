@@ -3,7 +3,7 @@
 
 文件默认用Blob
 */
-import { file2Buf, getNewUrl } from "./file.js"
+import { file2Buf, getNewUrl } from "./lib/file.js"
 
 var Words = document.getElementById("words")
 var Anchor = document.getElementById("bottom_anchor")

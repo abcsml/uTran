@@ -2,11 +2,11 @@
 连接前端和后端
 */
 
-import ajax from "./rtc/ajax.js"
-import { getRTCOffer } from "./rtc/rtcOffer.js"
-import { getRTCAnswer } from "./rtc/rtcAnswer.js"
+import ajax from "./lib/rtc/ajax.js"
+import { getRTCOffer } from "./lib/rtc/rtcOffer.js"
+import { getRTCAnswer } from "./lib/rtc/rtcAnswer.js"
 import chat from "./chat.js"
-import { sendMess, getMess, sendFile, getFile } from "./tran.js"
+import { sendMess, getMess, sendFile, getFile } from "./lib/tran.js"
 import debug from "./debug.js"
 
 var pathName = document.location.pathname

@@ -1,6 +1,5 @@
-// 跨网站提供api
-//const server = ""
-const server = "https://abcs.ml:9999"
+import CONFIG from "../config.js"
+const server = CONFIG.EXT_API_SERVER
 
 // 拦截器
 async function interceptors(response) {

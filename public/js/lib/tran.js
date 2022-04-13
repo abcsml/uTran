@@ -4,9 +4,10 @@
 */
 
 import { file2Buf, combineBuf, getNewUrl } from "./file.js"
+import CONFIG from "../config.js"
 
-const segSize = 32*8*1024;
-const tranSegTimeout = 32*1000
+const segSize = CONFIG.TRAN_SEG_SIZE
+const tranSegTimeout = CONFIG.TRAN_SEG_TIMEOUT
 
 function sendMess(baseDC, mess) {
     baseDC.send(JSON.stringify({
