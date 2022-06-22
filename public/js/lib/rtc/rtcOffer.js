@@ -16,7 +16,11 @@ const baseUrl = '/api/'
 
 async function getRTCOffer(room) {
     var rtcPC = new RTCPeerConnection({
-        iceServers:[{urls:"stun:stun.gmx.net"}]
+        iceServers:[
+            {urls:"stun:stun.miwifi.com"},
+            {urls:"stun:stun.pjsip.org"},
+            {urls:"stun:stun.netappel.com"}
+        ]
     })
     rtcPC.baseDC = rtcPC.createDataChannel("base", {negotiated: true, id: 0})
     rtcPC.createOffer({"iceRestart": true})

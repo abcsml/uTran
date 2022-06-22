@@ -41,7 +41,7 @@ router.get('/ans/:room', async (ctx, next) => {
 		setTimeout(()=>{
 			delete sources[room]
 			console.debug(`[debug] del ${room}`)
-		},1000)
+		},5*1000)
 		// console.debug(`[debug] del ${room}`)
 	} else {
 		// renew
