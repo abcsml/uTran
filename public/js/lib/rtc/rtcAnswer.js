@@ -12,9 +12,7 @@ const baseUrl = '/api/'
 async function getRTCAnswer(room) {
     var rtcPC = new RTCPeerConnection({
         iceServers:[
-            {urls:"stun:stun.miwifi.com"},
-            {urls:"stun:stun.pjsip.org"},
-            {urls:"stun:stun.netappel.com"}
+            {urls:"stun:stun.miwifi.com"}
         ]
     })
     rtcPC.baseDC = rtcPC.createDataChannel("base", {negotiated: true, id: 0})
